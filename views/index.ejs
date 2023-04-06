@@ -16,14 +16,18 @@
     <p>Empresa:<%= empresa %></p>
     <p>Salario:<%= inscritos %></p>
 
-<<<<<<< HEAD
+
     <% if(msg == true){ %>
-        <h3>ISSO É UMA MENSSAGEM DE ERRO!</h3>
+        <h3>ISSO É UMA MENSSAGEM DE ERRO!</h3> 
+    <%} else {%>
+        <h3>Nenhum erro!</h3>
     <%}%>
+
+    <% produtos.forEach (function(produto) { %>
+       <%= produto.nome %>
+       <%= produto.nome %>
+    <% }) %>
 
 </body>
 </html>
-=======
-</body>
-</html>
->>>>>>> b6ac57563f343e4faf7eeecd116c48263d46fb92
+
