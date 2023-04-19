@@ -32,7 +32,9 @@ app.use(bodyParser.json());
 //rotas
 
 app.get("/", (req, res) => {
-    Question.findAll({ raw: true }).then(questions => {
+    Question.findAll({ raw: true, order:[
+        ['id','DESC'] 
+    ]}).then(questions => {
         res.render("index", { 
             questions: questions
         });
@@ -56,6 +58,21 @@ app.post("/salvarpergunta", (req, res) => {
         console.log('Pergunta salva com sucesso!')
         res.redirect("/");
     });
+});
+
+app.get("/question/:id",(req, res) => {
+    var id = req.params.id;
+    Question.findOne({
+        where: {id: id}
+    }).then(Question => {
+        if(question != undefined){ //pergunta encontrada
+            res.render("Question", {
+                questions: questions
+            });
+        }else{ //não encontrada
+            res.redirect("/");
+        }
+    })
 });
 
 app.listen(8080, () => {console.log("APP RODANDO NA PORTA 8080!");});
