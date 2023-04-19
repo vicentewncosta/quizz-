@@ -2,7 +2,7 @@ const express = require("express");
 const app = express(); 
 const bodyParser = require ("body-parser");
 const connection = require ("./database/database");
-const questionModel = require ("./database/Question");
+const Question = require ("./database/Question");
 //database 
 
 connection
@@ -30,18 +30,32 @@ app.use(bodyParser.urlencoded({extended: false}))
 app.use(bodyParser.json());
 
 //rotas
+
 app.get("/", (req, res) => {
-    res.render("index");
+    Question.findAll({ raw: true }).then(questions => {
+        res.render("index", { 
+            questions: questions
+        });
+    });
 });
 
 app.get("/perguntar", (req, res) => {
     res.render("perguntar");
 }) 
 
+
 app.post("/salvarpergunta", (req, res) => {
+    //recebo os dados dos formulário e salvo nas variavéis 
     var titulo = req.body.titulo;
     var descricao = req.body.descricao;
-    res.send("formulário recebido! titulo " + titulo + " " + " descricao " + descricao);
+    //salvo no meu banco de dados, dando bom, redireciono meu usuário para a url desejada. 
+    Question.create({
+        titulo: titulo,
+        descricao: descricao
+    }).then(() => {
+        console.log('Pergunta salva com sucesso!')
+        res.redirect("/");
+    });
 });
 
 app.listen(8080, () => {console.log("APP RODANDO NA PORTA 8080!");});
