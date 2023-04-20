@@ -3,6 +3,7 @@ const app = express();
 const bodyParser = require ("body-parser");
 const connection = require ("./database/database");
 const Question = require ("./database/Question");
+const Resposta = require ("./database/Resposta");
 //database 
 
 connection
@@ -47,6 +48,7 @@ app.get("/perguntar", (req, res) => {
 
 
 app.post("/salvarpergunta", (req, res) => {
+
     //recebo os dados dos formulário e salvo nas variavéis 
     var titulo = req.body.titulo;
     var descricao = req.body.descricao;
@@ -55,7 +57,7 @@ app.post("/salvarpergunta", (req, res) => {
         titulo: titulo,
         descricao: descricao
     }).then(() => {
-        console.log('Pergunta salva com sucesso!')
+        //console.log('Pergunta salva com sucesso!')
         res.redirect("/");
     });
 });
@@ -64,7 +66,7 @@ app.get("/question/:id",(req, res) => {
     var id = req.params.id;
     Question.findOne({
         where: {id: id}
-    }).then(Question => {
+    }).then(question => {
         if(question != undefined){ //pergunta encontrada
             res.render("Question", {
                 questions: questions
