@@ -1,11 +1,12 @@
+//importações
 const express = require("express");
 const app = express(); 
-const bodyParser = require ("body-parser");
-const connection = require ("./database/database");
-const Question = require ("./database/Question");
-const Resposta = require ("./database/Resposta");
-//database 
+const bodyParser = require("body-parser");
+const connection = require("./database/database");
+const Pergunta = require("./database/Pergunta");
+const Resposta = require("./database/Resposta");
 
+//database 
 connection
     .authenticate()
     .then(() => {
@@ -33,11 +34,11 @@ app.use(bodyParser.json());
 //rotas
 
 app.get("/", (req, res) => {
-    Question.findAll({ raw: true, order:[
-        ['id','DESC'] 
-    ]}).then(questions => {
-        res.render("index", { 
-            questions: questions
+    Pergunta.findAll({ raw: true, order:[ //pesquisando as perguntas
+        ['id','DESC'] //ordenação
+    ]}).then(perguntas => {
+        res.render("index", { //mandando as perguntas para o frontend
+           perguntas: perguntas
         });
     });
 });
@@ -46,35 +47,53 @@ app.get("/perguntar", (req, res) => {
     res.render("perguntar");
 }) 
 
-
 app.post("/salvarpergunta", (req, res) => {
 
     //recebo os dados dos formulário e salvo nas variavéis 
     var titulo = req.body.titulo;
     var descricao = req.body.descricao;
-    //salvo no meu banco de dados, dando bom, redireciono meu usuário para a url desejada. 
-    Question.create({
+
+    Pergunta.create({ //mesma função do insert
         titulo: titulo,
         descricao: descricao
     }).then(() => {
-        //console.log('Pergunta salva com sucesso!')
+        console.log('Pergunta salva com sucesso!')
         res.redirect("/");
     });
 });
 
-app.get("/question/:id",(req, res) => {
+app.get("/pergunta/:id",(req, res) => {
     var id = req.params.id;
-    Question.findOne({
+    Pergunta.findOne({
         where: {id: id}
-    }).then(question => {
-        if(question != undefined){ //pergunta encontrada
-            res.render("Question", {
-                questions: questions
+    }).then(pergunta => { //recebo a pergunta
+        if(pergunta != undefined) { //pergunta encontrad
+            Resposta.findAll({
+                where: {perguntaId: perguntaId},
+                order: [
+                    ['id','DESC']
+                ]        
+            }).then(respostas => {
+                res.render("pergunta",{
+                    pergunta: pergunta,
+                    respostas: respostas
+                });
             });
-        }else{ //não encontrada
-            res.redirect("/");
+        }else{ //pergunta não encontrada
+            res.redirect("/"); 
         }
-    })
+    });
+});
+
+app.post("/responder", (req, res) => {
+    var corpo = res.body.corpo;
+    var perguntaId = req.body.pergunta;
+    Resposta.create({
+        corpo: corpo,
+        perguntaId: perguntaId
+    }).then(() => {
+        res.redirect("/pergunta/" + perguntaId); //redirecionando o usuário para a página da pergunta escollhida.
+    });
 });
 
 app.listen(8080, () => {console.log("APP RODANDO NA PORTA 8080!");});
